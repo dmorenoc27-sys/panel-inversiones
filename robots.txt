@@ -1,4 +1,4 @@
-# Dashboard UE003 — dmorenoc27-sys.github.io/panel-inversiones
+# Panel de Inversiones — dmorenoc27-sys.github.io/panel-inversiones
 # Buscadores tradicionales: bienvenidos
 User-agent: Googlebot
 Allow: /
