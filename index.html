@@ -32,10 +32,14 @@ async function abrir(raw){
  document.open();document.write(html);document.close();}
 function guardada(){try{return sessionStorage.getItem(S)||localStorage.getItem(S)}catch(_){return null}}
 var f=document.getElementById('f'),e=document.getElementById('e'),g=guardada();
-(g?abrir(b(g)):Promise.reject()).catch(function(){
- try{sessionStorage.removeItem(S);localStorage.removeItem(S)}catch(_){}
- if(window.top!==window){top.location.href=location.href;return}  // beta.html: pedir la clave arriba
- f.hidden=false;document.getElementById('k').focus();});
+function pedir(m){if(window.top!==window){top.location.href=location.href;return}  // beta.html: pedir la clave arriba
+ f.hidden=false;if(m)e.textContent=m;document.getElementById('k').focus();}
+function intentar(n){abrir(b(g)).catch(function(err){
+ if(err&&err.name==='OperationError'){  // clave guardada ya no sirve (cambio de clave): recien ahi se borra
+  try{sessionStorage.removeItem(S);localStorage.removeItem(S)}catch(_){}pedir();return}
+ if(n<3){setTimeout(function(){intentar(n+1)},1500);return}  // fallo de red/despliegue: NO borrar la clave guardada
+ pedir('No se pudo cargar (conexion o actualizacion en curso). Recargue la pagina en un minuto.')})}
+if(g)intentar(0);else pedir();
 f.onsubmit=async function(ev){ev.preventDefault();var bt=document.getElementById('b');bt.disabled=true;e.textContent='Verificando…';
  try{var km=await crypto.subtle.importKey('raw',new TextEncoder().encode(document.getElementById('k').value),'PBKDF2',false,['deriveBits']);
   var raw=new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',salt:b(P.s),iterations:P.it,hash:'SHA-256'},km,256));
